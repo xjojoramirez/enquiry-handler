@@ -4,15 +4,17 @@ import { listEnquiries } from '../api';
 export default function EnquiryHistory({ onSelect }) {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     listEnquiries()
       .then(setEnquiries)
-      .catch(() => {})
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <p className="text-sm text-gray-400">Loading...</p>;
+  if (error) return <p className="text-sm text-red-400">Failed to load history.</p>;
   if (enquiries.length === 0) return <p className="text-sm text-gray-400">No enquiries yet.</p>;
 
   return (

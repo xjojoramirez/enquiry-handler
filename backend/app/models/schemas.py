@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -20,7 +20,7 @@ class EnquiryResponse(BaseModel):
     entities: dict = {}
     recommended_team: str = ""
     suggested_response: str = ""
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ClassifyRequest(BaseModel):

@@ -6,18 +6,7 @@ import httpx
 
 from app.config.settings import settings
 
-CLASSIFICATION_TYPES = "|".join(settings.classification_types)
-
-SYSTEM_PROMPT = settings.system_prompt or f"""You are an AI assistant for Strata Management Consultants.
-Analyse the client enquiry and return a JSON object with:
-- classification: object with type ({CLASSIFICATION_TYPES}), subtype (string), confidence (0.0-1.0), explanation (string)
-- priority: low|medium|high
-- summary: one-sentence summary
-- entities: object with extracted names, unit numbers, etc.
-- recommended_team: string
-- suggested_response: draft reply text
-
-Think step by step before answering. Output valid JSON only."""
+SYSTEM_PROMPT = settings.system_prompt
 
 
 class GibberishDetector:

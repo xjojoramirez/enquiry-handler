@@ -25,9 +25,19 @@ class Settings:
             ["new_client", "support_request", "complaint", "general_question"],
         )
         self.webhook_url: str = self._config_data.get("webhook_url", "")
+        types_str = "|".join(self.classification_types)
         self.system_prompt: str = self._config_data.get(
             "system_prompt",
-            "You are an AI assistant for Strata Management Consultants.",
+            f"""You are an AI assistant for Strata Management Consultants.
+Analyse the client enquiry and return a JSON object with:
+- classification: object with type ({types_str}), subtype (string), confidence (0.0-1.0), explanation (string)
+- priority: low|medium|high
+- summary: one-sentence summary
+- entities: object with extracted names, unit numbers, etc.
+- recommended_team: string
+- suggested_response: draft reply text
+
+Think step by step before answering. Output valid JSON only.""",
         )
 
     def _load_config(self) -> dict:

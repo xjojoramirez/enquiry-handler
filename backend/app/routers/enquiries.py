@@ -63,14 +63,14 @@ async def list_enquiries():
     return await store.list_all()
 
 
+@router.get("/enquiries/export", response_model=list[EnquiryResponse])
+async def export_enquiries():
+    return await store.list_all()
+
+
 @router.get("/enquiries/{enquiry_id}", response_model=EnquiryResponse)
 async def get_enquiry(enquiry_id: UUID):
     enquiry = await store.get(enquiry_id)
     if enquiry is None:
         raise HTTPException(status_code=404, detail="Enquiry not found")
     return enquiry
-
-
-@router.get("/enquiries/export", response_model=list[EnquiryResponse])
-async def export_enquiries():
-    return await store.list_all()

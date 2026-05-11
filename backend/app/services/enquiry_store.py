@@ -1,8 +1,9 @@
+import json
 from uuid import UUID
 from typing import Optional
 
 from app.db.database import get_pool
-from app.models.schemas import EnquiryResponse
+from app.models.schemas import ClassificationResult, EnquiryResponse
 
 
 class EnquiryStore:
@@ -45,9 +46,6 @@ class EnquiryStore:
         return [self._row_to_enquiry(row) for row in rows]
 
     def _row_to_enquiry(self, row) -> EnquiryResponse:
-        from app.models.schemas import ClassificationResult
-        import json
-
         cls_data = json.loads(row["classification"])
         return EnquiryResponse(
             id=row["id"],
