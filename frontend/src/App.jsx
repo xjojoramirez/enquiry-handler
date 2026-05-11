@@ -1,0 +1,50 @@
+import { useState } from 'react';
+import EnquiryForm from './components/EnquiryForm';
+import ResultCard from './components/ResultCard';
+import EnquiryHistory from './components/EnquiryHistory';
+import ErrorBanner from './components/ErrorBanner';
+import LoadingSpinner from './components/LoadingSpinner';
+import { classify } from './api';
+
+export default function App() {
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleAnalyse = async (text) => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const data = await classify(text);
+      setResult(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <h1 className="text-xl font-bold text-gray-800">AI Enquiry Handler</h1>
+          <p className="text-sm text-gray-500">Strata Management Consultants</p>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-6 flex gap-6">
+        <div className="flex-1">
+          <EnquiryForm onSubmit={handleAnalyse} loading={loading} />
+          <ErrorBanner message={error} onDismiss={() => setError(null)} />
+          {loading && <LoadingSpinner />}
+          {result && <ResultCard result={result} />}
+        </div>
+        <aside className="w-72 shrink-0">
+          <EnquiryHistory onSelect={setResult} />
+        </aside>
+      </main>
+    </div>
+  );
+}
