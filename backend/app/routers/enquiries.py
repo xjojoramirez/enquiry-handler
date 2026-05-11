@@ -1,13 +1,28 @@
 from uuid import UUID
 
+import httpx
 from fastapi import APIRouter, HTTPException
 
+from app.config.settings import settings
 from app.models.schemas import ClassifyRequest, ClassifyResponse, EnquiryResponse
 from app.services.ai_service import classify_enquiry
 from app.services.enquiry_store import EnquiryStore
 
 router = APIRouter(prefix="/api", tags=["enquiries"])
 store = EnquiryStore()
+
+
+async def _fire_webhook(enquiry: EnquiryResponse):
+    if not settings.webhook_url:
+        return
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                settings.webhook_url,
+                json=enquiry.model_dump(mode="json"),
+            )
+    except Exception:
+        pass
 
 
 @router.post("/classify", response_model=ClassifyResponse)
@@ -38,7 +53,9 @@ async def create_enquiry(req: ClassifyRequest):
         recommended_team=result.get("recommended_team", ""),
         suggested_response=result.get("suggested_response", ""),
     )
-    return await store.save(enquiry)
+    saved = await store.save(enquiry)
+    await _fire_webhook(saved)
+    return saved
 
 
 @router.get("/enquiries", response_model=list[EnquiryResponse])
