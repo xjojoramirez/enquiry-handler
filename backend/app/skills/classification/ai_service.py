@@ -33,9 +33,11 @@ def sanitize_input(text: str) -> str:
 
 
 _INJECTION_PATTERNS = [
-    re.compile(r"\bignore\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|system|rules?)\b", re.IGNORECASE),
-    re.compile(r"\bforget\s+(?:(?:your|previous|all)\s+)*(?:instructions?|prompt|role|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bignore\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|system)\b", re.IGNORECASE),
+    re.compile(r"\bforget\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|role|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bforget\b", re.IGNORECASE),
     re.compile(r"\bdisregard\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bdisregard\b", re.IGNORECASE),
     re.compile(r"\byou\s+are\s+now\b", re.IGNORECASE),
     re.compile(r"\bpretend\s+you\s+are\b", re.IGNORECASE),
     re.compile(r"\broleplay\s+as\b", re.IGNORECASE),
