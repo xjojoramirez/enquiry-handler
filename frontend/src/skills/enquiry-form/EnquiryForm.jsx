@@ -14,7 +14,7 @@ export default function EnquiryForm({ onSubmit, loading }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste client enquiry here..."
-        className="w-full min-h-[70vh] rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+        className="w-full h-[70vh] rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
         disabled={loading}
       />
       <button
