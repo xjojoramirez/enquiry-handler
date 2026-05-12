@@ -1,11 +1,14 @@
 import hashlib
 import json
+import logging
 import re
 from typing import Any
 
 import httpx
 
 from app.config.settings import settings
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = settings.system_prompt
 _cache: dict[str, dict[str, Any]] = {}
@@ -27,6 +30,29 @@ def sanitize_input(text: str) -> str:
     cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
     return cleaned.strip()
+
+
+_INJECTION_PATTERNS = [
+    re.compile(r"\bignore\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|system|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bforget\s+(?:(?:your|previous|all)\s+)*(?:instructions?|prompt|role|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bdisregard\s+(?:(?:your|previous|all|the)\s+)*(?:instructions?|prompt|rules?)\b", re.IGNORECASE),
+    re.compile(r"\byou\s+are\s+now\b", re.IGNORECASE),
+    re.compile(r"\bpretend\s+you\s+are\b", re.IGNORECASE),
+    re.compile(r"\broleplay\s+as\b", re.IGNORECASE),
+    re.compile(r"\boverride\s+(?:(?:your|previous|the)\s+)*(?:instructions?|prompt|rules?)\b", re.IGNORECASE),
+    re.compile(r"\bnew\s+role\b", re.IGNORECASE),
+]
+
+_SEVERE_THRESHOLD = 3
+
+
+def sanitize_prompt_injection(text: str) -> tuple[str, int]:
+    count = 0
+    for pattern in _INJECTION_PATTERNS:
+        matches = pattern.findall(text)
+        count += len(matches)
+        text = pattern.sub("[redacted]", text)
+    return text, count
 
 
 def extract_json(text: str) -> dict[str, Any]:
