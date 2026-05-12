@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import EnquiryForm from './skills/enquiry-form/EnquiryForm';
 import ResultCard from './skills/result-card/ResultCard';
-import EnquiryHistory from './skills/enquiry-history/EnquiryHistory';
-import ErrorBanner from './skills/shared/ErrorBanner';
 import LoadingSpinner from './skills/shared/LoadingSpinner';
+import ErrorBanner from './skills/shared/ErrorBanner';
 import { classify } from './api';
 
 export default function App() {
@@ -11,7 +10,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleAnalyse = async (text) => {
+  async function handleAnalyse(text) {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -23,7 +22,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -34,16 +33,17 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 flex gap-6">
-        <div className="flex-1">
-          <EnquiryForm onSubmit={handleAnalyse} loading={loading} />
-          <ErrorBanner message={error} onDismiss={() => setError(null)} />
-          {loading && <LoadingSpinner />}
-          {result && <ResultCard result={result} />}
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-1">
+            <EnquiryForm onSubmit={handleAnalyse} loading={loading} />
+          </div>
+          <div className="flex-1">
+            {loading && <LoadingSpinner />}
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
+            {result && !loading && <ResultCard result={result} />}
+          </div>
         </div>
-        <aside className="w-72 shrink-0">
-          <EnquiryHistory onSelect={setResult} />
-        </aside>
       </main>
     </div>
   );
