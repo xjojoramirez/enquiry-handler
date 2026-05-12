@@ -113,26 +113,44 @@ def extract_json(text: str) -> dict[str, Any]:
     raise ValueError("No JSON found in response")
 
 
+def _rejection_response() -> dict[str, Any]:
+    return {
+        "classification": {
+            "type": "general_question",
+            "subtype": "unprocessable",
+            "confidence": 0.0,
+            "explanation": "Could not process the enquiry.",
+        },
+        "priority": "low",
+        "summary": "Could not process enquiry.",
+        "entities": {},
+        "recommended_team": "General",
+        "suggested_response": _SAFE_DEFAULT_RESPONSE,
+    }
+
+
+def _format_enquiry(text: str) -> str:
+    return f"---ENQUIRY BEGIN---\n{text}\n---ENQUIRY END---"
+
+
 async def classify_enquiry(text: str) -> dict[str, Any]:
     detector = GibberishDetector()
     if detector.is_gibberish(text):
-        return {
-            "classification": {
-                "type": "general_question",
-                "subtype": "unprocessable",
-                "confidence": 0.0,
-                "explanation": "Input could not be understood.",
-            },
-            "priority": "low",
-            "summary": "Unprocessable enquiry.",
-            "entities": {},
-            "recommended_team": "General",
-            "suggested_response": "I'm sorry, I couldn't understand your enquiry. Could you please rephrase it?",
-        }
+        return _rejection_response()
 
     text = sanitize_input(text)
+    sanitized, injection_count = sanitize_prompt_injection(text)
 
-    key = hashlib.sha256(text.encode()).hexdigest()
+    if injection_count >= _SEVERE_THRESHOLD:
+        logger.warning("Prompt injection attempt: severe — rejected input")
+        return _rejection_response()
+
+    if injection_count > 0:
+        logger.warning("Prompt injection attempt: minor neutralization (%d pattern(s))", injection_count)
+
+    formatted = _format_enquiry(sanitized)
+
+    key = hashlib.sha256(formatted.encode()).hexdigest()
     if key in _cache:
         return _cache[key]
 
@@ -144,18 +162,34 @@ async def classify_enquiry(text: str) -> dict[str, Any]:
         "model": settings.model_name,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": text},
+            {"role": "user", "content": formatted},
         ],
         "temperature": 0,
     }
 
-    async with httpx.AsyncClient(timeout=90.0) as client:
-        url = f"{settings.model_base_url.rstrip('/')}/chat/completions"
-        resp = await client.post(url, json=payload, headers=headers)
-        resp.raise_for_status()
-        data = resp.json()
-        content = data["choices"][0]["message"]["content"]
+    try:
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            url = f"{settings.model_base_url.rstrip('/')}/chat/completions"
+            resp = await client.post(url, json=payload, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.error("AI service error: %s", e)
+        return _rejection_response()
 
-    result = extract_json(content)
+    try:
+        result = extract_json(content)
+    except (ValueError, json.JSONDecodeError):
+        logger.warning("AI response was not valid JSON, returning fallback")
+        return _rejection_response()
+
+    if isinstance(result.get("classification"), dict):
+        subtype = result["classification"].get("subtype", "")
+        if subtype == "injection_attempt":
+            logger.warning("AI detected injection attempt in output")
+            return _rejection_response()
+
+    result = scrub_response(result)
     _cache[key] = result
     return result
