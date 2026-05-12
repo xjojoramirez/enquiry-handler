@@ -55,6 +55,54 @@ def sanitize_prompt_injection(text: str) -> tuple[str, int]:
     return text, count
 
 
+_LEAKAGE_PATTERNS = [
+    re.compile(r"\bsystem\s+prompt\b", re.IGNORECASE),
+    re.compile(r"\bENQUIRY\s+BEGIN\b"),
+    re.compile(r"\bENQUIRY\s+END\b"),
+    re.compile(r"\bmy\s+instructions?\b", re.IGNORECASE),
+    re.compile(r"\byour\s+instructions?\b", re.IGNORECASE),
+    re.compile(r"\breveal(?:ing)?\s+my\b", re.IGNORECASE),
+    re.compile(r"\bSECRET\b"),
+]
+
+_SAFE_DEFAULT_RESPONSE = "We were unable to process your enquiry. Please rephrase and try again."
+
+_SAFE_DEFAULT_CLASSIFICATION = {
+    "type": "general_question",
+    "subtype": "unprocessable",
+    "confidence": 0.0,
+    "explanation": "Could not process the enquiry.",
+}
+
+
+def _scrub_field(text: str) -> str:
+    for pattern in _LEAKAGE_PATTERNS:
+        text = pattern.sub("[redacted]", text)
+    return text
+
+
+def scrub_response(result: dict[str, Any]) -> dict[str, Any]:
+    leaked = False
+    for field in ("suggested_response", "summary"):
+        if field in result:
+            original = result[field]
+            scrubbed = _scrub_field(original)
+            if scrubbed != original:
+                result[field] = scrubbed
+                leaked = True
+    if "classification" in result and isinstance(result["classification"], dict):
+        for subfield in ("explanation",):
+            if subfield in result["classification"]:
+                original = result["classification"][subfield]
+                scrubbed = _scrub_field(original)
+                if scrubbed != original:
+                    result["classification"][subfield] = scrubbed
+                    leaked = True
+    if leaked:
+        logger.warning("Potential system prompt leakage in output")
+    return result
+
+
 def extract_json(text: str) -> dict[str, Any]:
     match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
     if match:
