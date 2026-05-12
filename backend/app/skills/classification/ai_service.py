@@ -23,6 +23,12 @@ class GibberishDetector:
         return ratio > 0.85
 
 
+def sanitize_input(text: str) -> str:
+    cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
 def extract_json(text: str) -> dict[str, Any]:
     match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
     if match:
@@ -49,6 +55,8 @@ async def classify_enquiry(text: str) -> dict[str, Any]:
             "recommended_team": "General",
             "suggested_response": "I'm sorry, I couldn't understand your enquiry. Could you please rephrase it?",
         }
+
+    text = sanitize_input(text)
 
     key = hashlib.sha256(text.encode()).hexdigest()
     if key in _cache:
