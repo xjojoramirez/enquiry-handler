@@ -12,24 +12,9 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-export function classify(text) {
+export async function classify(text) {
   return request('/classify', {
     method: 'POST',
     body: JSON.stringify({ text }),
   });
-}
-
-export function submitEnquiry(text) {
-  return request('/enquiries', {
-    method: 'POST',
-    body: JSON.stringify({ text }),
-  });
-}
-
-export function listEnquiries() {
-  return request('/enquiries');
-}
-
-export function getEnquiry(id) {
-  return request(`/enquiries/${id}`);
 }
