@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import get_pool, close_pool
-from app.db.migrations import run_migrations
-from app.routers.enquiries import router
+from app.skills.storage.database import get_pool, close_pool
+from app.skills.storage.migrations import run_migrations
+from app.skills.api.routers import router
 
 
 @asynccontextmanager

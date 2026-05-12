@@ -1,7 +1,7 @@
 import pytest
 from uuid import uuid4
-from app.models.schemas import EnquiryResponse, ClassificationResult
-from app.services.enquiry_store import EnquiryStore
+from app.skills.classification.schemas import EnquiryResponse, ClassificationResult
+from app.skills.storage.enquiry_store import EnquiryStore
 
 
 @pytest.mark.asyncio

@@ -6,10 +6,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-enquiries}
       POSTGRES_USER: ${POSTGRES_USER:-enquiries}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-enquiries}
+      PGPORT: 6102
+    ports:
+      - "6102:6102"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 6102 -U ${POSTGRES_USER:-enquiries} -d ${POSTGRES_DB:-enquiries}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -18,9 +21,9 @@ services:
     build: ./backend
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "6101:6101"
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://enquiries:enquiries@db:5432/enquiries}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://enquiries:enquiries@db:6102/enquiries}
       API_KEY: ${API_KEY:-}
       MODEL_NAME: ${MODEL_NAME:-deepseek-v4-flash}
       MODEL_BASE_URL: ${MODEL_BASE_URL:-https://api.opencode.ai/v1}
@@ -32,7 +35,7 @@ services:
     build: ./frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "6100:6100"
     depends_on:
       - backend
 

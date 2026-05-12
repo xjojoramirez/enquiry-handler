@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listEnquiries } from '../api';
+import { listEnquiries } from '../../api';
 
 export default function EnquiryHistory({ onSelect }) {
   const [enquiries, setEnquiries] = useState([]);

@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 from typing import Any
@@ -7,6 +8,7 @@ import httpx
 from app.config.settings import settings
 
 SYSTEM_PROMPT = settings.system_prompt
+_cache: dict[str, dict[str, Any]] = {}
 
 
 class GibberishDetector:
@@ -48,6 +50,10 @@ async def classify_enquiry(text: str) -> dict[str, Any]:
             "suggested_response": "I'm sorry, I couldn't understand your enquiry. Could you please rephrase it?",
         }
 
+    key = hashlib.sha256(text.encode()).hexdigest()
+    if key in _cache:
+        return _cache[key]
+
     headers = {
         "Authorization": f"Bearer {settings.api_key}",
         "Content-Type": "application/json",
@@ -58,14 +64,16 @@ async def classify_enquiry(text: str) -> dict[str, Any]:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": text},
         ],
-        "temperature": 0.3,
+        "temperature": 0,
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=90.0) as client:
         url = f"{settings.model_base_url.rstrip('/')}/chat/completions"
         resp = await client.post(url, json=payload, headers=headers)
         resp.raise_for_status()
         data = resp.json()
         content = data["choices"][0]["message"]["content"]
 
-    return extract_json(content)
+    result = extract_json(content)
+    _cache[key] = result
+    return result

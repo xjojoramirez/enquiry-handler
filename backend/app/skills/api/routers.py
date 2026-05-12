@@ -4,9 +4,9 @@ import httpx
 from fastapi import APIRouter, HTTPException
 
 from app.config.settings import settings
-from app.models.schemas import ClassifyRequest, ClassifyResponse, EnquiryResponse
-from app.services.ai_service import classify_enquiry
-from app.services.enquiry_store import EnquiryStore
+from app.skills.classification.schemas import ClassifyRequest, ClassifyResponse, EnquiryResponse
+from app.skills.classification.ai_service import classify_enquiry
+from app.skills.storage.enquiry_store import EnquiryStore
 
 router = APIRouter(prefix="/api", tags=["enquiries"])
 store = EnquiryStore()

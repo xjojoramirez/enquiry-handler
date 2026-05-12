@@ -28,7 +28,16 @@ export default function ResultCard({ result }) {
       {entities && Object.keys(entities).length > 0 && (
         <div>
           <p className="text-sm text-gray-500 mb-1">Entities</p>
-          <pre className="text-sm bg-gray-50 p-2 rounded">{JSON.stringify(entities, null, 2)}</pre>
+          <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+            <tbody>
+              {Object.entries(entities).filter(([, v]) => v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0)).map(([key, value]) => (
+                <tr key={key} className="border-b border-gray-200 last:border-0">
+                  <td className="px-3 py-2 font-medium capitalize bg-gray-50 w-1/3">{key.replace(/_/g, ' ')}</td>
+                  <td className="px-3 py-2">{Array.isArray(value) ? value.join(', ') : String(value)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

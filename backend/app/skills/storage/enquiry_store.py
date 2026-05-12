@@ -2,8 +2,8 @@ import json
 from uuid import UUID
 from typing import Optional
 
-from app.db.database import get_pool
-from app.models.schemas import ClassificationResult, EnquiryResponse
+from app.skills.storage.database import get_pool
+from app.skills.classification.schemas import ClassificationResult, EnquiryResponse
 
 
 class EnquiryStore:

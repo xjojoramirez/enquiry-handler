@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import EnquiryForm from './components/EnquiryForm';
-import ResultCard from './components/ResultCard';
-import EnquiryHistory from './components/EnquiryHistory';
-import ErrorBanner from './components/ErrorBanner';
-import LoadingSpinner from './components/LoadingSpinner';
+import EnquiryForm from './skills/enquiry-form/EnquiryForm';
+import ResultCard from './skills/result-card/ResultCard';
+import EnquiryHistory from './skills/enquiry-history/EnquiryHistory';
+import ErrorBanner from './skills/shared/ErrorBanner';
+import LoadingSpinner from './skills/shared/LoadingSpinner';
 import { classify } from './api';
 
 export default function App() {

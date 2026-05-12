@@ -1,5 +1,5 @@
 import pytest
-from app.services.ai_service import classify_enquiry, GibberishDetector
+from app.skills.classification.ai_service import classify_enquiry, GibberishDetector
 
 
 def test_gibberish_detection():
