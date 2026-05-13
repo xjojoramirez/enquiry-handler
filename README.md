@@ -16,7 +16,7 @@ The user pastes a raw client email/enquiry into the web UI. The system sends it 
    - **Entities** — extracted names, addresses, dates, amounts
    - **Recommended team** — which internal team should handle it
    - **Suggested response** — a complete, professional email draft ready to send
-4. Past analyses appear in the sidebar history; click any to revisit
+4. Past analyses appear in the history panel on the left; click any to revisit
 
 ## How the System Prompt Matches Company Information
 
@@ -68,7 +68,7 @@ Three Docker containers: frontend (nginx), backend (uvicorn), database (PostgreS
 | POST | /api/enquiries | Analyse + persist to database |
 | GET | /api/enquiries | List all processed enquiries |
 | GET | /api/enquiries/{id} | Get single enquiry detail |
-| GET | /api/enquiries/export | Export all enquiries as JSON |
+| GET | /api/enquiries/export | List all enquiries (alias) |
 
 ## Design Decisions
 
