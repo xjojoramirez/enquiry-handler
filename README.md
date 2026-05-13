@@ -18,13 +18,6 @@ The user pastes a raw client email/enquiry into the web UI. The system sends it 
    - **Suggested response** — a complete, professional email draft ready to send
 4. Past analyses appear in the sidebar history; click any to revisit
 
-## Quick Start
-
-1. **Clone and enter the project**
-2. **Copy environment file** — `cp .env.example .env` and edit `API_KEY` with your LLM provider key
-3. **Start all services** — `docker compose up --build`
-4. **Open** — http://localhost in your browser
-
 ## How the System Prompt Matches Company Information
 
 The system prompt (in `backend/config.yaml`) embeds Strata Business Brokers' real business details directly into the LLM's instructions:
@@ -35,6 +28,13 @@ The system prompt (in `backend/config.yaml`) embeds Strata Business Brokers' rea
 - **Analysis process** — step-by-step instructions that mirror how a human broker would triage an enquiry: identify buy/sell/valuation intent, note urgency signals, reason about the classification, suggest a concrete next action
 
 This ensures every response is framed in SBB's voice, references the correct services, and produces output that staff can act on without editing.
+
+## Quick Start
+
+1. **Clone and enter the project**
+2. **Copy environment file** — `cp .env.example .env` and edit `API_KEY` with your LLM provider key
+3. **Start all services** — `docker compose up --build`
+4. **Open** — http://localhost in your browser
 
 ## Configuration
 
