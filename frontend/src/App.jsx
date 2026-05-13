@@ -36,13 +36,24 @@ export default function App() {
     try {
       const data = await classify(enquiryText);
       setResult(data);
-      const entry = {
-        id: Date.now(),
-        text: enquiryText,
-        result: data,
-        timestamp: new Date().toISOString(),
-      };
-      const updated = [entry, ...history].slice(0, MAX_HISTORY);
+      const existing = history.findIndex((e) => e.text === enquiryText);
+      let updated;
+      if (existing !== -1) {
+        updated = [...history];
+        updated[existing] = {
+          ...updated[existing],
+          result: data,
+          timestamp: new Date().toISOString(),
+        };
+      } else {
+        const entry = {
+          id: Date.now(),
+          text: enquiryText,
+          result: data,
+          timestamp: new Date().toISOString(),
+        };
+        updated = [entry, ...history].slice(0, MAX_HISTORY);
+      }
       setHistory(updated);
       saveHistory(updated);
     } catch (err) {
