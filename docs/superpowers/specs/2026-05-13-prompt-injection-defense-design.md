@@ -70,7 +70,7 @@ The rest of the existing prompt remains unchanged.
     "summary": "Could not process enquiry.",
     "entities": {},
     "recommended_team": "General",
-    "suggested_response": "We were unable to process your enquiry. Please rephrase and try again."
+    "suggested_response": "This email content relates to an enquiry, support request, or general question."
 }
 ```
 

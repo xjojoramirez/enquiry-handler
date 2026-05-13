@@ -235,7 +235,7 @@ _LEAKAGE_PATTERNS = [
     re.compile(r"\bSECRET\b", re.IGNORECASE),
 ]
 
-_SAFE_DEFAULT_RESPONSE = "We were unable to process your enquiry. Please rephrase and try again."
+_SAFE_DEFAULT_RESPONSE = "This email content relates to an enquiry, support request, or general question."
 
 _SAFE_DEFAULT_CLASSIFICATION = {
     "type": "general_question",
