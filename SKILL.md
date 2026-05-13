@@ -5,7 +5,7 @@ description: Use when setting up, configuring, or understanding the AI Enquiry H
 
 # AI Enquiry Handler
 
-An AI-powered tool for Strata Management Consultants to process incoming client enquiries. Classifies, summarises, and drafts responses automatically.
+An AI-powered tool for Strata Business Brokers to process incoming client enquiries. Classifies, summarises, and drafts responses automatically.
 
 ## Skills
 

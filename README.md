@@ -1,6 +1,22 @@
 # AI Enquiry Handler
 
-An AI-powered tool for Strata Management Consultants to process incoming client enquiries. Classifies, summarises, and drafts responses automatically.
+An AI-powered enquiry triage tool built for **Strata Business Brokers**, Australia's specialist broker for strata management business sales.
+
+The user pastes a raw client email/enquiry into the web UI. The system sends it to an LLM (with a company-specific system prompt), which analyses the enquiry and returns a structured assessment — including classification, priority, summary, and a draft response ready to send. No external email or CRM integration required for core usage.
+
+## Usage
+
+1. Paste a client enquiry (email text) into the text area
+2. Click **"Analyse Enquiry"** — the system sends it to the LLM for analysis
+3. Review the structured result:
+   - **Classification** — type (new\_client / support\_request / complaint / general\_question) and subtype describing the next action
+   - **Confidence** — how certain the LLM is about the classification (0–100%)
+   - **Priority** — low / medium / high
+   - **Summary** — one-sentence recap of the client's situation
+   - **Entities** — extracted names, addresses, dates, amounts
+   - **Recommended team** — which internal team should handle it
+   - **Suggested response** — a complete, professional email draft ready to send
+4. Past analyses appear in the sidebar history; click any to revisit
 
 ## Quick Start
 
@@ -9,12 +25,16 @@ An AI-powered tool for Strata Management Consultants to process incoming client 
 3. **Start all services** — `docker compose up --build`
 4. **Open** — http://localhost in your browser
 
-## Usage
+## How the System Prompt Matches Company Information
 
-1. Paste a client enquiry into the text area
-2. Click "Analyse Enquiry"
-3. View the classification, confidence, priority, summary, and suggested response
-4. Past analyses appear in the sidebar history
+The system prompt (in `backend/config.yaml`) embeds Strata Business Brokers' real business details directly into the LLM's instructions:
+
+- **Company identity** — name, tagline ("Bridging opportunity and success in strata management business sales"), specialisation (exclusively strata), director (David Lin)
+- **Services** — the six core service lines (valuation, marketing, negotiation, due diligence, transaction management, end-to-end service)
+- **Differentiators** — unrivalled buyer network, nationwide reach, confidential process, hands-on service
+- **Analysis process** — step-by-step instructions that mirror how a human broker would triage an enquiry: identify buy/sell/valuation intent, note urgency signals, reason about the classification, suggest a concrete next action
+
+This ensures every response is framed in SBB's voice, references the correct services, and produces output that staff can act on without editing.
 
 ## Configuration
 

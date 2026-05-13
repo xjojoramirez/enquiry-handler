@@ -28,7 +28,7 @@ class Settings:
         types_str = "|".join(self.classification_types)
         self.system_prompt: str = self._config_data.get(
             "system_prompt",
-            f"""You are an AI assistant for Strata Management Consultants.
+            f"""You are an AI assistant for Strata Business Brokers.
 Analyse the client enquiry and return a JSON object with:
 - classification: object with type ({types_str}), subtype (string), confidence (0.0-1.0), explanation (string)
 - priority: low|medium|high
